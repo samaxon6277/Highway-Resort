@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Highway Resort</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-login {
+            max-width: 400px;
+            margin: 100px auto;
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+
+        .admin-login input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .admin-dashboard {
+            display: none;
+            padding: 40px 0;
+            min-height: 80vh;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+
+        .edit-btn {
+            background: #FFA000;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #D32F2F;
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+        }
+
+        .form-group-admin {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group-admin label {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group-admin input,
+        .form-group-admin textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+    </style>
+</head>
+
+<body style="background-color: #f4f6f8;">
+
+    <!-- Login Prompt -->
+    <div class="admin-login" id="admin-login">
+        <h2>Admin Access</h2>
+        <p style="margin-bottom:20px; color:var(--text-light);">Enter password to continue</p>
+        <form id="login-form">
+            <input type="password" id="admin-pwd" placeholder="Password (admin123)" required>
+            <button type="submit" class="btn" style="width:100%;">Login</button>
+            <p id="login-err" style="color:red; margin-top:10px; display:none;">Incorrect password</p>
+        </form>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="admin-dashboard" id="admin-dashboard">
+        <nav class="navbar" style="position:static; border-bottom:1px solid #ddd; padding:15px 40px; box-shadow:none;">
+            <div class="logo">Highway Resort Admin</div>
+            <div>
+                <a href="index.html" class="btn btn-outline" style="margin-right:10px;">View Site</a>
+                <button class="btn" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <div class="container" style="margin-top: 40px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h2>Manage Rooms</h2>
+                <button class="btn" onclick="openModal()">+ Add New Room</button>
+            </div>
+
+            <table id="rooms-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Price/Night</th>
+                        <th>Features (truncated)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Room Modal -->
+    <div class="modal" id="room-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Add Room</h3>
+            <form id="room-form">
+                <input type="hidden" id="room-id">
+                <div class="form-group-admin">
+                    <label>Room Name</label>
+                    <input type="text" id="m-name" required>
+                </div>
+                <div class="form-group-admin">
+                    <label>Price</label>
+                    <input type="number" id="m-price" min="0" required>
+                </div>
+                <div class="form-group-admin">
+                    <label>Image URL</label>
+                    <input type="url" id="m-image" required>
+                </div>
+                <div class="form-group-admin">
+                    <label>Features (comma separated)</label>
+                    <input type="text" id="m-features" required placeholder="King Bed, Free WiFi, Balcony">
+                </div>
+                <div class="form-group-admin">
+                    <label>Description</label>
+                    <textarea id="m-description" rows="3" required></textarea>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button type="submit" class="btn" style="flex:1;">Save Room</button>
+                    <button type="button" class="btn btn-outline" onclick="closeModal()" style="flex:1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Admin Auth State
+        const checkAuth = () => {
+            if (sessionStorage.getItem('admin_logged_in') === 'true') {
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                loadRooms();
+            }
+        };
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pwd = document.getElementById('admin-pwd').value;
+            if (pwd === 'admin123') {
+                sessionStorage.setItem('admin_logged_in', 'true');
+                checkAuth();
+            } else {
+                document.getElementById('login-err').style.display = 'block';
+            }
+        });
+
+        function logout() {
+            sessionStorage.removeItem('admin_logged_in');
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('admin-login').style.display = 'block';
+            document.getElementById('admin-pwd').value = '';
+        }
+
+        // Room CRUD logic
+        let currentRooms = [];
+
+        function loadRooms() {
+            currentRooms = JSON.parse(localStorage.getItem('rooms')) || [];
+            const tbody = document.querySelector('#rooms-table tbody');
+            tbody.innerHTML = '';
+
+            currentRooms.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${r.id}</td>
+                    <td><strong>${r.name}</strong></td>
+                    <td>$${r.price}</td>
+                    <td>${r.features.slice(0, 2).join(', ')}...</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="editRoom(${r.id})">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteRoom(${r.id})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        const modal = document.getElementById('room-modal');
+        function openModal() {
+            document.getElementById('room-form').reset();
+            document.getElementById('room-id').value = '';
+            document.getElementById('modal-title').textContent = 'Add Room';
+            modal.style.display = 'flex';
+        }
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        function editRoom(id) {
+            const room = currentRooms.find(r => r.id === id);
+            if (room) {
+                document.getElementById('room-id').value = room.id;
+                document.getElementById('m-name').value = room.name;
+                document.getElementById('m-price').value = room.price;
+                document.getElementById('m-image').value = room.image;
+                document.getElementById('m-features').value = room.features.join(', ');
+                document.getElementById('m-description').value = room.description;
+                document.getElementById('modal-title').textContent = 'Edit Room';
+                modal.style.display = 'flex';
+            }
+        }
+
+        function deleteRoom(id) {
+            if (confirm("Are you sure you want to delete this room?")) {
+                currentRooms = currentRooms.filter(r => r.id !== id);
+                localStorage.setItem('rooms', JSON.stringify(currentRooms));
+                loadRooms();
+            }
+        }
+
+        document.getElementById('room-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('room-id').value;
+            const newRoom = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('m-name').value,
+                price: parseFloat(document.getElementById('m-price').value),
+                image: document.getElementById('m-image').value,
+                features: document.getElementById('m-features').value.split(',').map(s => s.trim()),
+                description: document.getElementById('m-description').value
+            };
+
+            if (id) {
+                const idx = currentRooms.findIndex(r => r.id === parseInt(id));
+                currentRooms[idx] = newRoom;
+            } else {
+                currentRooms.push(newRoom);
+            }
+
+            localStorage.setItem('rooms', JSON.stringify(currentRooms));
+            closeModal();
+            loadRooms();
+        });
+
+        // Initialize state
+        checkAuth();
+    </script>
+</body>
+
+</html>
