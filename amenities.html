@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resort Amenities | Highway Resort</title>
+    <meta name="description"
+        content="Discover the world-class amenities at Highway Resort, including our spa, pool, and fine dining.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo" id="resort-logo">
+                <i class="fas fa-leaf"></i> Highway Resort
+            </a>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="rooms.html">Rooms</a></li>
+                <li><a href="amenities.html" class="active">Amenities</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="booking.html" class="btn" style="color: white; padding: 8px 16px;">Book Now</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-header">
+            <div class="container">
+                <h1>World-Class Amenities</h1>
+                <p>Everything you need for a comfortable stay</p>
+            </div>
+        </div>
+
+        <div class="container" style="padding-bottom: 80px;">
+            <div class="grid" id="amenities-container">
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h4>Highway Resort</h4>
+                    <p>Experience the pinnacle of luxury and comfort in our beautiful resort.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="rooms.html">Rooms</a></li>
+                        <li><a href="amenities.html">Amenities</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="booking.html">Booking</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Paradise Lane, Tropical Island</li>
+                        <li><i class="fas fa-phone"></i> +91 98970 63990</li>
+                        <li><i class="fas fa-envelope"></i> info@highwayresort.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Highway Resort. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('amenities-container');
+            const amenities = JSON.parse(localStorage.getItem('amenities')) || [];
+
+            if (amenities.length === 0) {
+                container.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">No amenities found.</p>';
+                return;
+            }
+
+            let html = '';
+            amenities.forEach(am => {
+                html += `
+                    <div class="card">
+                        <i class="${am.icon}" style="font-size:3rem; color:var(--secondary-color); margin-bottom:20px; display:block;"></i>
+                        <h3 style="margin-bottom:10px;">${am.name}</h3>
+                        <p style="color:var(--text-light);">${am.description || ''}</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        });
+    </script>
+</body>
+
+</html>
